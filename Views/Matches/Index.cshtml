@@ -1,0 +1,325 @@
+@model IEnumerable<SportsPortal.Models.Match>
+
+@{
+    ViewData["Title"] = "Matches";
+    Layout = User.IsInRole("Organizer") ? "_LayoutAdmin" : "_LayoutPublic";
+}
+
+<h1 class="text-primary mb-4">@(User.IsInRole("Organizer") ? "Manage Matches" : "Matches")</h1>
+
+@if (User.IsInRole("Organizer"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary shadow-sm mb-3">
+            <i class="bi bi-plus-circle me-1"></i> Create New Match
+        </a>
+    </p>
+}
+
+<form asp-controller="Matches" asp-action="Index" method="get" class="mb-4 bg-light p-3 rounded shadow-sm">
+    <div class="row g-3">
+        <div class="col-md-2">
+            <label class="form-label small fw-bold">Category</label>
+            <select name="category" class="form-select form-select-sm" asp-items="Html.GetEnumSelectList<SportsPortal.Models.TeamCategory>()">
+                <option value="">All Categories</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-bold">Sport</label>
+            <select name="sportId" class="form-select form-select-sm" asp-items="ViewBag.SportID">
+                <option value="">All Sports</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-bold">Department</label>
+            <select name="deptId" class="form-select form-select-sm" asp-items="ViewBag.DeptID">
+                <option value="">All Departments</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-bold">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">All Statuses</option>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Live">Live</option>
+                <option value="Finished">Finished</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
+@Html.AntiForgeryToken()
+
+@if (User.IsInRole("Organizer"))
+{
+    <div class="alert alert-success d-none sticky-top mt-2" style="top: 80px; z-index: 1050;" id="successAlert" role="alert">
+        Score updated successfully!
+    </div>
+    <div class="alert alert-danger d-none sticky-top mt-2" style="top: 80px; z-index: 1050;" id="errorAlert" role="alert">
+        Error updating score. Please try again.
+    </div>
+}
+
+<div class="matches-container">
+    @foreach (var item in Model)
+    {
+        var deptAPlayers = item.DepartmentA?.Players.Where(p => p.SportID == item.SportID).ToList() ?? new List<SportsPortal.Models.Player>();
+        var deptBPlayers = item.DepartmentB?.Players.Where(p => p.SportID == item.SportID).ToList() ?? new List<SportsPortal.Models.Player>();
+        
+        var deptACaptain = deptAPlayers.FirstOrDefault(p => p.IsCaptain);
+        var deptBCaptain = deptBPlayers.FirstOrDefault(p => p.IsCaptain);
+
+        <div class="card match-card mb-3 shadow-sm border-0 rounded-4 overflow-hidden" id="match-card-@item.MatchID">
+            <!-- Header: Always Visible -->
+            <div class="card-header match-header d-flex justify-content-between align-items-center bg-white cursor-pointer py-3" onclick="toggleMatchDetails(@item.MatchID)">
+                <div class="d-flex align-items-center flex-grow-1">
+                    <div class="match-date text-muted me-4 text-center" style="min-width: 80px;">
+                        <div class="fw-bold">@item.MatchDate.ToString("MMM dd")</div>
+                        <div class="small">@item.MatchDate.ToString("HH:mm")</div>
+                    </div>
+                    <div class="match-teams flex-grow-1 text-center">
+                        <div class="d-flex justify-content-center align-items-center gap-3">
+                            <span class="fw-bold fs-5 text-primary">@(item.DepartmentA?.DeptName ?? "TBD")</span>
+                            <span class="badge bg-light text-muted border">VS</span>
+                            <span class="fw-bold fs-5 text-danger">@(item.DepartmentB?.DeptName ?? "TBD")</span>
+                        </div>
+                        <div class="mt-1">
+                            <span class="small text-muted">@item.Sport?.SportName</span>
+                            <span class="badge @(item.Category == SportsPortal.Models.TeamCategory.Boys ? "bg-primary" : "bg-danger") ms-2" style="font-size: 0.65rem;">@item.Category</span>
+                        </div>
+                    </div>
+                    <div class="match-status text-end" style="min-width: 120px;">
+                        @{
+                            var statusClass = item.Status switch {
+                                "Live" => "bg-danger pulse-animation",
+                                "Finished" => "bg-dark",
+                                _ => "bg-success"
+                            };
+                        }
+                        <span class="badge @statusClass mb-1">@item.Status</span>
+                        @if(item.Status != "Scheduled") 
+                        {
+                            <div class="fw-bold fs-5">@item.ScoreA - @item.ScoreB</div>
+                        }
+                    </div>
+                </div>
+                <div class="ms-3">
+                    <i class="bi bi-chevron-down transition-icon" id="icon-@item.MatchID"></i>
+                </div>
+            </div>
+
+            <!-- Details: Expandable -->
+            <div class="collapse-content" id="details-@item.MatchID">
+                <div class="card-body bg-light border-top p-4">
+                    
+                    @if (User.IsInRole("Organizer"))
+                    {
+                        <!-- Admin Controls inside the expanded view -->
+                        <div class="admin-controls mb-4 p-3 bg-white rounded-4 border shadow-sm">
+                            <h6 class="text-muted mb-3 fw-bold small text-uppercase">Admin Quick Update</h6>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-auto">
+                                    <label class="form-label small fw-bold">Score A</label>
+                                    <input type="text" class="form-control form-control-sm" id="scoreA-@item.MatchID" value="@item.ScoreA" style="width: 80px;">
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-label small fw-bold">Score B</label>
+                                    <input type="text" class="form-control form-control-sm" id="scoreB-@item.MatchID" value="@item.ScoreB" style="width: 80px;">
+                                </div>
+                                <div class="col-auto">
+                                    <label class="form-label small fw-bold">Status</label>
+                                    <select class="form-select form-select-sm" id="status-@item.MatchID" style="width: 120px;">
+                                        <option value="Scheduled" selected="@(item.Status == "Scheduled" ? "selected" : null)">Scheduled</option>
+                                        <option value="Live" selected="@(item.Status == "Live" ? "selected" : null)">Live</option>
+                                        <option value="Finished" selected="@(item.Status == "Finished" ? "selected" : null)">Finished</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto d-flex gap-2">
+                                    <button class="btn btn-sm btn-success px-3 update-score-btn" data-matchid="@item.MatchID">Save</button>
+                                    <a asp-action="Edit" asp-route-id="@item.MatchID" class="btn btn-sm btn-outline-primary">Full Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.MatchID" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="row g-4">
+                        <!-- Team A Details -->
+                        <div class="col-md-6 border-md-end">
+                            <div class="text-center mb-3">
+                                <h5 class="text-primary mb-1">@(item.DepartmentA?.DeptName ?? "TBD")</h5>
+                                <div class="small text-muted">
+                                    <span class="fw-bold">Captain:</span> @(deptACaptain?.FullName ?? "Not Assigned")
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-3 p-3 border">
+                                <h6 class="fw-bold small text-uppercase text-muted mb-2">Squad</h6>
+                                @if (deptAPlayers.Any())
+                                {
+                                    <div class="row row-cols-2 g-1 small">
+                                        @foreach (var p in deptAPlayers)
+                                        {
+                                            <div class="col">@p.FullName</div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted small mb-0">No players registered.</p>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Team B Details -->
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <h5 class="text-danger mb-1">@(item.DepartmentB?.DeptName ?? "TBD")</h5>
+                                <div class="small text-muted">
+                                    <span class="fw-bold">Captain:</span> @(deptBCaptain?.FullName ?? "Not Assigned")
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-3 p-3 border">
+                                <h6 class="fw-bold small text-uppercase text-muted mb-2">Squad</h6>
+                                @if (deptBPlayers.Any())
+                                {
+                                    <div class="row row-cols-2 g-1 small">
+                                        @foreach (var p in deptBPlayers)
+                                        {
+                                            <div class="col">@p.FullName</div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted small mb-0">No players registered.</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .match-card {
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        }
+        .match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        
+        .collapse-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease-in-out;
+            opacity: 0;
+        }
+        .collapse-content.show {
+            max-height: 2000px;
+            opacity: 1;
+        }
+
+        .transition-icon {
+            transition: transform 0.3s ease;
+        }
+        .rotate-icon {
+            transform: rotate(180deg);
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        @@media (min-width: 768px) {
+            .border-md-end {
+                border-right: 1px solid #dee2e6 !important;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function toggleMatchDetails(matchId) {
+            const detailsDiv = document.getElementById(`details-${matchId}`);
+            const icon = document.getElementById(`icon-${matchId}`);
+            
+            if (detailsDiv.classList.contains('show')) {
+                detailsDiv.classList.remove('show');
+                icon.classList.remove('rotate-icon');
+            } else {
+                detailsDiv.classList.add('show');
+                icon.classList.add('rotate-icon');
+            }
+        }
+
+        @if (User.IsInRole("Organizer"))
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                const successAlert = document.getElementById('successAlert');
+                const errorAlert = document.getElementById('errorAlert');
+
+                document.querySelectorAll('.update-score-btn').forEach(button => {
+                    button.addEventListener('click', async function (e) {
+                        e.stopPropagation();
+                        const matchId = this.dataset.matchid;
+                        const scoreA = document.getElementById(`scoreA-${matchId}`).value;
+                        const scoreB = document.getElementById(`scoreB-${matchId}`).value;
+                        const status = document.getElementById(`status-${matchId}`).value;
+
+                        try {
+                            const response = await fetch('/api/matches/updateScore', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                                },
+                                body: JSON.stringify({
+                                    matchID: parseInt(matchId),
+                                    scoreA: scoreA,
+                                    scoreB: scoreB,
+                                    status: status
+                                })
+                            });
+
+                            if (response.ok) {
+                                successAlert.classList.remove('d-none');
+                                setTimeout(() => successAlert.classList.add('d-none'), 3000);
+                                // Optional: Update UI scores without reload
+                            } else {
+                                errorAlert.classList.remove('d-none');
+                                setTimeout(() => errorAlert.classList.add('d-none'), 3000);
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            errorAlert.classList.remove('d-none');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.admin-controls input, .admin-controls select').forEach(el => {
+                    el.addEventListener('click', e => e.stopPropagation());
+                });
+            });
+            </text>
+        }
+    </script>
+}

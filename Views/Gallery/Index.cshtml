@@ -1,0 +1,105 @@
+@model IEnumerable<SportsPortal.Models.GalleryImage>
+
+@{
+    ViewData["Title"] = "Event Gallery";
+    var categories = ViewBag.Categories as List<string>;
+    var currentCategory = ViewBag.CurrentCategory as string;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4 text-primary fw-bold">Event Gallery</h1>
+        @if (User.IsInRole("Organizer"))
+        {
+            <a asp-action="Upload" class="btn btn-primary rounded-pill px-4"><i class="bi bi-cloud-upload me-2"></i>Upload Photo</a>
+        }
+    </div>
+
+    <!-- Filter -->
+    <div class="mb-4">
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-action="Index" asp-route-category="All" class="btn btn-sm rounded-pill px-3 @(currentCategory == "All" ? "btn-dark" : "btn-outline-dark")">All</a>
+            @if (categories != null)
+            {
+                foreach (var cat in categories)
+                {
+                    <a asp-action="Index" asp-route-category="@cat" class="btn btn-sm rounded-pill px-3 @(currentCategory == cat ? "btn-dark" : "btn-outline-dark")">@cat</a>
+                }
+            }
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="gallery-grid">
+            @foreach (var item in Model)
+            {
+                <div class="gallery-item mb-3 break-inside-avoid">
+                    <div class="card border-0 shadow-sm overflow-hidden position-relative group-hover">
+                        <img src="@item.ImagePath" class="img-fluid w-100" alt="@item.Title" style="cursor: pointer;" onclick="openLightbox(this)">
+                        
+                        <!-- Overlay Info -->
+                        <div class="gallery-overlay position-absolute bottom-0 start-0 w-100 p-3 bg-dark bg-opacity-75 text-white" style="transform: translateY(100%); transition: transform 0.3s ease;">
+                            <h6 class="mb-0">@item.Title</h6>
+                            <small class="text-white-50">@item.Category</small>
+                            @if (User.IsInRole("Organizer"))
+                            {
+                                <form asp-action="Delete" asp-route-id="@item.ImageID" method="post" class="mt-2 d-inline-block" onsubmit="return confirm('Delete this image?');">
+                                    <button type="submit" class="btn btn-danger btn-sm py-0 px-2" style="font-size: 0.7rem;">Delete</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-images display-1 d-block mb-3 opacity-25"></i>
+            <h3>No photos yet</h3>
+            <p>Check back later for event highlights!</p>
+        </div>
+    }
+</div>
+
+<!-- Simple Lightbox Modal -->
+<div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 text-center position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <img id="lightboxImage" src="" class="img-fluid rounded shadow-lg" style="max-height: 90vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .gallery-grid {
+            column-count: 1;
+            column-gap: 1rem;
+        }
+        @@media (min-width: 576px) { .gallery-grid { column-count: 2; } }
+        @@media (min-width: 992px) { .gallery-grid { column-count: 3; } }
+        
+        .break-inside-avoid { break-inside: avoid; }
+        
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0) !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function openLightbox(img) {
+            var src = img.getAttribute("src");
+            document.getElementById("lightboxImage").setAttribute("src", src);
+            var myModal = new bootstrap.Modal(document.getElementById('lightboxModal'));
+            myModal.show();
+        }
+    </script>
+}

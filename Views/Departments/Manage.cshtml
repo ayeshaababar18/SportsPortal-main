@@ -1,0 +1,71 @@
+@model IEnumerable<SportsPortal.Models.Department>
+
+@{
+    ViewData["Title"] = "Manage Departments";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-5 display-4 text-primary">Manage Departments</h1>
+
+    <p class="text-center mb-4">
+        <a asp-action="Create" class="btn btn-primary">Create New Department</a>
+    </p>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var department in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm department-card">
+                        <a asp-action="Details" asp-route-id="@department.DeptID" class="text-decoration-none text-dark">
+                            @if (!string.IsNullOrEmpty(department.LogoUrl))
+                            {
+                                <img src="@department.LogoUrl" class="card-img-top department-logo" alt="@department.DeptName Logo">
+                            }
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-primary">@department.DeptName</h5>
+                                <p class="card-text text-muted">Total Points: @department.TotalPoints</p>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-transparent border-top-0 text-center pb-3">
+                            <a asp-action="Edit" asp-route-id="@department.DeptID" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@department.DeptID" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center" role="alert">
+            No departments found.
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .department-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--cust-secondary); /* Use CUST secondary color for border */
+        }
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Keep generic shadow */
+        }
+        .department-logo {
+            max-height: 150px;
+            object-fit: contain;
+            padding: 15px;
+            background-color: var(--cust-light-gray); /* Use CUST light gray for logo area background */
+            border-bottom: 1px solid var(--cust-secondary); /* Use CUST secondary color for border */
+        }
+        .card-title.text-primary {
+            color: var(--cust-primary) !important; /* Use CUST primary color */
+            font-weight: 600;
+        }
+    </style>
+}

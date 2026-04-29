@@ -1,0 +1,122 @@
+@model SportsPortal.Models.UpdateCaptainViewModel
+
+@{
+    ViewData["Title"] = "Update Captains";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-5 display-4 text-primary">Update Captains</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg p-4">
+                <form asp-action="UpdateCaptains" method="post">
+                    <div class="mb-3">
+                        <label asp-for="SelectedDepartmentId" class="form-label">Department</label>
+                        <select asp-for="SelectedDepartmentId" asp-items="@Model.Departments" class="form-select">
+                            <option value="">-- Select Department --</option>
+                        </select>
+                        <span asp-validation-for="SelectedDepartmentId" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="SelectedSportId" class="form-label">Sport</label>
+                        <select asp-for="SelectedSportId" asp-items="@Model.Sports" class="form-select">
+                            <option value="">-- Select Sport --</option>
+                        </select>
+                        <span asp-validation-for="SelectedSportId" class="text-danger"></span>
+                    </div>
+
+                    <div id="captainInfo" class="mb-3" style="display: none;">
+                        <p>Current Captain: <strong id="currentCaptainName"></strong> (Player ID: <span id="currentCaptainId"></span>)</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NewCaptainFullName" class="form-label">New Captain Full Name</label>
+                        <input asp-for="NewCaptainFullName" class="form-control" />
+                        <span asp-validation-for="NewCaptainFullName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NewCaptainRegNumber" class="form-label">New Captain Registration Number (Optional)</label>
+                        <input asp-for="NewCaptainRegNumber" class="form-control" type="number" />
+                        <span asp-validation-for="NewCaptainRegNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">Update Captain</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const departmentSelect = document.getElementById('SelectedDepartmentId');
+            const sportSelect = document.getElementById('SelectedSportId');
+            const captainInfoDiv = document.getElementById('captainInfo');
+            const currentCaptainNameSpan = document.getElementById('currentCaptainName');
+            const currentCaptainIdSpan = document.getElementById('currentCaptainId');
+            const newCaptainFullNameInput = document.getElementById('NewCaptainFullName');
+
+            async function fetchCurrentCaptain() {
+                const deptId = departmentSelect.value;
+                const sportId = sportSelect.value;
+
+                if (deptId && sportId) {
+                    try {
+                        const response = await fetch(`/api/players/captain?deptId=${deptId}&sportId=${sportId}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.captain) {
+                                currentCaptainNameSpan.textContent = data.captain.fullName;
+                                currentCaptainIdSpan.textContent = data.captain.playerID;
+                                newCaptainFullNameInput.value = data.captain.fullName; // Pre-fill with current captain
+                                captainInfoDiv.style.display = 'block';
+                            } else {
+                                currentCaptainNameSpan.textContent = 'N/A';
+                                currentCaptainIdSpan.textContent = 'N/A';
+                                newCaptainFullNameInput.value = ''; // Clear if no captain
+                                captainInfoDiv.style.display = 'none';
+                            }
+                        } else {
+                            console.error('Error fetching current captain:', response.statusText);
+                            captainInfoDiv.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                        captainInfoDiv.style.display = 'none';
+                    }
+                } else {
+                    captainInfoDiv.style.display = 'none';
+                }
+            }
+
+            departmentSelect.addEventListener('change', fetchCurrentCaptain);
+            sportSelect.addEventListener('change', fetchCurrentCaptain);
+
+            // Fetch on initial load if values are pre-selected (e.g., after a postback with validation errors)
+            if (departmentSelect.value && sportSelect.value) {
+                fetchCurrentCaptain();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,54 @@
+# Project Report: SportsPortal
+
+## Introduction
+SportsPortal is a comprehensive web-based management system built with ASP.NET Core (targeting .NET 10.0). It is designed to facilitate the organization and display of sports events, likely for an academic institution or an inter-departmental sports league. The system handles the entire lifecycle of a sports season, from managing teams and players to scheduling matches, recording scores, and calculating points for leaderboards. It features a public-facing portal for news and results, alongside a secure administrative backend for data management.
+
+## System Modules
+
+The application is modularized into several key functional areas:
+
+### 1. Administration Module
+* Purpose: Secure backend for system administrators to configure the season and manage sensitive data.
+* Key Features:
+    * Dashboard: Central hub for admin actions.
+    * System Settings: Configuration of global application settings.
+    * Points Calculation: Tools to trigger recalculations of team standings (RecalculatePoints).
+    * Captain Management: Specific functionality to assign or update team captains (UpdateCaptains).
+    * Access Control: Handles login and access denial flows.
+
+### 2. Match Management
+* Purpose: Core engine for scheduling and recording sporting events.
+* Key Features:
+    * Scheduling: Creation and editing of match fixtures (ScheduledMatches).
+    * Live Scoring: Support for live match updates (LiveMatchViewModel).
+    * Results: Recording final scores and match outcomes.
+    * Categorization: Support for different match categories (e.g., League, Knockout).
+
+### 3. Team & Player Management
+* Purpose: Manages the entities participating in the sports events.
+* Key Features:
+    * Departments: Manages organizational units (e.g., "Computer Science", "Electrical Engineering") that field teams.
+    * Teams: Creation of teams linked to departments, sports, and specific categories (Gender, Team Category).
+    * Players: Detailed player profiles including team association and specific roles.
+
+### 4. Sports & Categories
+* Purpose: Defines the scope of athletic activities available.
+* Key Features:
+    * CRUD (Create, Read, Update, Delete) operations for different types of sports (e.g., Cricket, Football, Badminton).
+    * Management of sport-specific rules or categories.
+
+### 5. Public Information & Engagement
+* Purpose: The primary interface for general users, students, or fans.
+* Key Features:
+    * Announcements: News feed for important updates, schedule changes, or highlights.
+    * Gallery: Image repository for event photos (GalleryController).
+    * Points Table: Dynamic leaderboard showing current standings based on match results.
+    * Search: Global search functionality to quickly find teams, players, or matches.
+
+## Technical Additional Details
+
+* Framework: The project utilizes ASP.NET Core MVC (Model-View-Controller) architecture.
+* Database & ORM: It uses Entity Framework Core for data access (ApplicationDbContext), with a robust migration history indicating an evolving schema (handling years, team categories, gallery images, etc.).
+* Frontend: The UI is built using Razor Views (.cshtml) styled with Bootstrap and custom CSS, utilizing jQuery for client-side interactions (likely for the points table logic and validation).
+* Data Seeding: Includes a SeedData.cs component, ensuring the application can be initialized with default admin users, sports, or lookup data for development or fresh deployments.
+* Services: Contains a specific GeminiService.cs, suggesting potential integration with AI services or specialized internal logic handler.

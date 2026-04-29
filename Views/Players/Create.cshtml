@@ -1,0 +1,46 @@
+@model SportsPortal.Models.Player
+
+@{
+    ViewData["Title"] = "Create Player";
+}
+
+
+<h4>Player</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegNumber" class="control-label"></label>
+                <input asp-for="RegNumber" class="form-control" />
+                <span asp-validation-for="RegNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsCaptain" /> @Html.DisplayNameFor(model => model.IsCaptain)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="DeptID" class="control-label"></label>
+                <select asp-for="DeptID" class ="form-control" asp-items="ViewBag.DeptID"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SportID" class ="control-label"></label>
+                <select asp-for="SportID" class ="form-control" asp-items="ViewBag.SportID"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

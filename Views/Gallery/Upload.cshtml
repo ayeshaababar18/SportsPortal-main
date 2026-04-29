@@ -1,0 +1,75 @@
+@model SportsPortal.Models.GalleryImage
+
+@{
+    ViewData["Title"] = "Upload Photo";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0 text-primary">Upload Photo</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Upload" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Title/Description</label>
+                            <input asp-for="Title" class="form-control" placeholder="e.g., Opening Ceremony" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label">Category</label>
+                            <select asp-for="Category" class="form-select">
+                                <option value="General">General</option>
+                                <option value="Cricket">Cricket</option>
+                                <option value="Futsal">Futsal</option>
+                                <option value="Badminton">Badminton</option>
+                                <option value="Table Tennis">Table Tennis</option>
+                                <option value="Volleyball">Volleyball</option>
+                                <option value="Prize Distribution">Prize Distribution</option>
+                            </select>
+                            <span asp-validation-for="Category" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Select Image</label>
+                            <input type="file" name="ImageFile" class="form-control" accept="image/*" required onchange="previewImage(this)"/>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="ImageFile" data-valmsg-replace="true"></span>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="mb-4 text-center d-none" id="previewContainer">
+                            <img id="imgPreview" src="#" alt="Preview" class="img-fluid rounded shadow-sm" style="max-height: 200px;" />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill">Upload</button>
+                            <a asp-action="Index" class="btn btn-light rounded-pill">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imgPreview').attr('src', e.target.result);
+                    $('#previewContainer').removeClass('d-none');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

@@ -1,0 +1,9 @@
+@model string // Expects a string which is the ReturnUrl
+@{
+    var returnUrl = Model;
+}
+
+<div class="mb-3">
+    <button id="backButton" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</button>
+</div>
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>

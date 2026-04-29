@@ -1,0 +1,157 @@
+@model SportsPortal.Models.SportDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Sport.SportName + " Details";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="display-4 text-primary fw-bold mb-0">@Model.Sport.SportName</h1>
+        <span class="badge bg-primary rounded-pill fs-6">@Model.Teams.Count Teams</span>
+    </div>
+
+    <ul class="nav nav-pills mb-4" id="sportTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4" id="matches-tab" data-bs-toggle="tab" data-bs-target="#matches" type="button" role="tab" aria-controls="matches" aria-selected="true">Matches</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 ms-2" id="players-tab" data-bs-toggle="tab" data-bs-target="#players" type="button" role="tab" aria-controls="players" aria-selected="false">Players & Teams</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="sportTabsContent">
+        <!-- Matches Tab -->
+        <div class="tab-pane fade show active" id="matches" role="tabpanel" aria-labelledby="matches-tab">
+            <div class="row g-4">
+                <!-- Upcoming Matches Section -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100 border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h4 class="mb-0 text-secondary fw-bold"><i class="bi bi-calendar-event me-2 text-primary"></i>Upcoming</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (Model.UpcomingMatches.Any())
+                            {
+                                <div class="list-group list-group-flush">
+                                    @foreach (var match in Model.UpcomingMatches)
+                                    {
+                                        <div class="list-group-item py-3 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="small">
+                                                    <span class="fw-bold">@match.DepartmentA?.DeptName</span> 
+                                                    <span class="text-muted px-1">vs</span> 
+                                                    <span class="fw-bold">@match.DepartmentB?.DeptName</span>
+                                                </div>
+                                                <span class="badge bg-light text-primary border rounded-pill small">@match.MatchDate.ToString("MMM dd")</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center text-muted small">
+                                    No upcoming matches.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Results Section -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100 border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h4 class="mb-0 text-secondary fw-bold"><i class="bi bi-check-circle me-2 text-success"></i>Results</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            @if (Model.CompletedMatches.Any())
+                            {
+                                <div class="list-group list-group-flush">
+                                    @foreach (var match in Model.CompletedMatches)
+                                    {
+                                        <div class="list-group-item py-3 px-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="small text-truncate" style="max-width: 70%;">
+                                                    <span>@match.DepartmentA?.DeptName</span> 
+                                                    <span class="text-muted px-1">vs</span> 
+                                                    <span>@match.DepartmentB?.DeptName</span>
+                                                </div>
+                                                <span class="fw-bold text-success">@match.ScoreA-@match.ScoreB</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-4 text-center text-muted small">
+                                    No results yet.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players & Teams Tab -->
+        <div class="tab-pane fade" id="players" role="tabpanel" aria-labelledby="players-tab">
+            <h4 class="mb-4 text-secondary fw-bold px-2"><i class="bi bi-people me-2 text-primary"></i>Participating Teams</h4>
+            @if (Model.Players.Any())
+            {
+                var teams = Model.Players.GroupBy(p => p.Department).OrderBy(g => g.Key.DeptName);
+                foreach (var team in teams)
+                {
+                    <div class="card shadow-sm mb-4 border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-light border-0 py-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="mb-0 fw-bold text-primary">@team.Key.DeptName</h5>
+                                <span class="badge bg-white text-primary border rounded-pill px-3">@team.Count() Players</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 40%;" class="ps-4">Name</th>
+                                            <th style="width: 30%;">Reg Number</th>
+                                            <th style="width: 30%;">Role</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var player in team)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold ps-4">@player.FullName</td>
+                                                <td>@player.RegNumber</td>
+                                                <td>
+                                                    @if (player.IsCaptain)
+                                                    {
+                                                        <span class="badge bg-warning text-dark rounded-pill px-3"><i class="bi bi-star-fill me-1"></i>Captain</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted small">Player</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info text-center rounded-4 py-5 border-0">
+                    <i class="bi bi-info-circle display-4 d-block mb-3 opacity-50"></i>
+                    No players registered for this sport yet.
+                </div>
+            }
+        </div>
+    </div>
+</div>

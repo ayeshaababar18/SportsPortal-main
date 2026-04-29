@@ -1,0 +1,298 @@
+@model SportsPortal.Models.HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container py-4">
+    <div class="hero-section mb-5" ng-app="sportsPortalApp" ng-controller="liveTickerController">
+        <h1 class="display-4">Live Score Update</h1>
+        <p class="lead" id="liveTickerContent">{{ liveTickerContent }}</p>
+        <span id="liveIndicator" class="badge bg-danger live-indicator pulse-animation" ng-show="liveIndicator">LIVE</span>
+    </div>
+
+    <!-- AI Search Section -->
+    <div id="aiSearchCard" class="card mb-5 shadow-sm border-primary ai-card-transition">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-robot me-2"></i>Ask AI about Sports Week</h5>
+        </div>
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <input type="text" id="aiQuery" class="form-control" placeholder="E.g., Who won the football match? or Which department is leading?">
+                <button class="btn btn-ai-prominent" type="button" id="btnAskAI"><i class="bi bi-stars me-2"></i>Ask AI</button>
+            </div>
+            <div id="aiResponseContainer" class="d-none">
+                <div class="ai-response-box position-relative">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-2" id="btnClearAI" aria-label="Close" title="Clear Response"></button>
+                    <strong>AI Response:</strong>
+                    <div id="aiResponseText" class="mt-2"></div>
+                </div>
+            </div>
+            <div id="aiLoading" class="text-center d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Thinking...</span>
+                </div>
+                <p class="text-muted small mt-2">Thinking...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-3">Latest Announcements</h2>
+            @if (Model.Announcements.Any())
+            {
+                foreach (var announcement in Model.Announcements)
+                {
+                    var alertClass = announcement.Priority == "High" ? "alert-danger" : "alert-info";
+                    <div class="alert @alertClass" role="alert">
+                        <h4 class="alert-heading">Announcement!</h4>
+                        <p>@announcement.Message</p>
+                        <hr>
+                        <p class="mb-0 text-muted">Posted on: @announcement.PostedDate.ToShortDateString()</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    No announcements available at the moment.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="mb-3">Today's Matches</h2>
+            
+            <form asp-action="Index" method="get" class="mb-4 bg-white p-3 rounded shadow-sm border">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Category (Live)</label>
+                        <select id="categoryFilter" class="form-select form-select-sm">
+                            <option value="All">All Categories</option>
+                            <option value="Boys">Boys Only</option>
+                            <option value="Girls">Girls Only</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Sport</label>
+                        <select name="sportId" class="form-select form-select-sm" asp-items="ViewBag.SportID">
+                            <option value="">All Sports</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">Department</label>
+                        <select name="deptId" class="form-select form-select-sm" asp-items="ViewBag.DeptID">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Apply Filters</button>
+                        <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Clear</a>
+                    </div>
+                </div>
+            </form>
+
+            @if (Model.MatchesToday.Any())
+            {
+                <table class="table table-striped table-hover shadow-sm rounded-3 overflow-hidden">
+                    <thead class="table-cust-header bg-primary text-white">
+                        <tr>
+                            <th>Time</th>
+                            <th>Sport & Category</th>
+                            <th>Department A</th>
+                            <th>Department B</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var match in Model.MatchesToday)
+                        {
+                            <tr class="match-row" data-category="@match.Category">
+                                <td>@match.MatchDate.ToShortTimeString()</td>
+                                <td>
+                                    <div class="fw-bold">@match.Sport.SportName</div>
+                                    <span class="badge @(match.Category == SportsPortal.Models.TeamCategory.Boys ? "bg-primary" : "bg-danger")" style="font-size: 0.7rem;">@match.Category</span>
+                                </td>
+                                <td>@(match.DepartmentA?.DeptName ?? "TBD")</td>
+                                <td>@(match.DepartmentB?.DeptName ?? "TBD")</td>
+                                <td>@(match.ScoreA ?? "N/A") - @(match.ScoreB ?? "N/A")</td>
+                                <td>@match.Status</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    No matches scheduled for today.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnAskAI = document.getElementById('btnAskAI');
+            const aiQuery = document.getElementById('aiQuery');
+            const aiResponseContainer = document.getElementById('aiResponseContainer');
+            const aiResponseText = document.getElementById('aiResponseText');
+            const aiLoading = document.getElementById('aiLoading');
+            const aiCard = document.getElementById('aiSearchCard');
+
+            function expandAI() {
+                aiCard.classList.add('active');
+            }
+
+            function collapseAI() {
+                aiCard.classList.remove('active');
+            }
+
+            aiQuery.addEventListener('focus', expandAI);
+            
+            // Collapse when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!aiCard.contains(e.target)) {
+                    collapseAI();
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && aiCard.classList.contains('active')) {
+                    collapseAI();
+                    aiQuery.blur();
+                }
+            });
+
+            function formatAIResponse(text) {
+                if (!text) return "";
+                // 1. Escape HTML (basic security)
+                let safe = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                
+                // 2. Bold: **text** -> <strong>text</strong>
+                safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                
+                // 3. Lists: * text -> <li>text</li>
+                // We wrap contiguous li elements in ul later or just let browser handle loose li if lazy, 
+                // but better to just replace bullets.
+                // Simple bullet replacement:
+                safe = safe.replace(/^[\*\-]\s+(.*)$/gm, '<li>$1</li>');
+                
+                // 4. Wrap lists? If we have <li>, maybe wrap in <ul>?
+                // For simplicity, let's just use <br> for newlines that aren't lists
+                safe = safe.replace(/\n/g, '<br>');
+                
+                return safe;
+            }
+
+            // AI Clear Button
+            const btnClearAI = document.getElementById('btnClearAI');
+            if (btnClearAI) {
+                btnClearAI.addEventListener('click', function() {
+                    aiResponseContainer.classList.add('d-none');
+                    aiQuery.value = '';
+                });
+            }
+
+            // Category Filter for Matches
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', function() {
+                    const selected = this.value;
+                    const rows = document.querySelectorAll('.match-row');
+                    rows.forEach(row => {
+                        if (selected === 'All' || row.dataset.category === selected) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            btnAskAI.addEventListener('click', async function () {
+                const query = aiQuery.value.trim();
+                if (!query) return;
+
+                // UI Reset
+                aiResponseContainer.classList.add('d-none');
+                aiLoading.classList.remove('d-none');
+                btnAskAI.disabled = true;
+
+                try {
+                    const response = await fetch('/Home/AskAI', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(query)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        aiResponseText.innerHTML = formatAIResponse(data.answer);
+                        aiResponseContainer.classList.remove('d-none');
+                    } else {
+                        aiResponseText.innerText = "Sorry, I couldn't process your request right now.";
+                        aiResponseContainer.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    console.error('AI Error:', error);
+                    aiResponseText.innerText = "An error occurred while connecting to the AI service.";
+                    aiResponseContainer.classList.remove('d-none');
+                } finally {
+                    aiLoading.classList.add('d-none');
+                    btnAskAI.disabled = false;
+                }
+            });
+        });
+
+        var app = angular.module('sportsPortalApp', []);
+
+        app.controller('liveTickerController', function ($scope, $http, $interval) {
+            $scope.liveTickerContent = "Loading live scores...";
+            $scope.liveIndicator = false;
+
+            function fetchLiveScores() {
+                $http.get('/Home/GetLiveMatches') // Updated API endpoint
+                    .then(function (response) {
+                        var liveMatches = response.data; // This will be an array of LiveMatchViewModel
+                        if (liveMatches && liveMatches.length > 0) {
+                            // Prioritize live matches, then next scheduled match
+                            var liveMatch = liveMatches.find(m => m.status === "Live");
+                            if (liveMatch) {
+                                $scope.liveTickerContent = `${liveMatch.departmentA_Name} vs ${liveMatch.departmentB_Name} - ${liveMatch.scoreA ?? 'N/A'} : ${liveMatch.scoreB ?? 'N/A'}`;
+                                $scope.liveIndicator = true;
+                            } else {
+                                // Find the soonest scheduled match
+                                var nextMatch = liveMatches.sort((a, b) => new Date(a.matchDateTime) - new Date(b.matchDateTime))[0];
+                                if (nextMatch) {
+                                    $scope.liveTickerContent = `Next Match: ${nextMatch.departmentA_Name} vs ${nextMatch.departmentB_Name} ${nextMatch.timeRemaining ? '(' + nextMatch.timeRemaining + ')' : ''}`;
+                                    $liveIndicator = false;
+                                } else {
+                                    $scope.liveTickerContent = "No live or upcoming matches at the moment.";
+                                    $scope.liveIndicator = false;
+                                }
+                            }
+                        } else {
+                            $scope.liveTickerContent = "No live or upcoming matches at the moment.";
+                            $scope.liveIndicator = false;
+                        }
+                    }, function (error) {
+                        console.error("Error fetching live scores:", error);
+                        $scope.liveTickerContent = "Failed to load live scores.";
+                        $scope.liveIndicator = false;
+                    });
+            }
+
+            fetchLiveScores();
+            $interval(fetchLiveScores, 30000); // Update every 30 seconds
+        });
+    </script>
+}
+

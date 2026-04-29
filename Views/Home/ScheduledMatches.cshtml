@@ -1,0 +1,96 @@
+@model IEnumerable<SportsPortal.Models.Match>
+
+@{
+    ViewData["Title"] = "Scheduled Matches";
+    Layout = "_LayoutPublic";
+}
+
+<div class="container py-4">
+    <h1 class="text-primary mb-4 text-center">Scheduled Matches</h1>
+
+    <form asp-action="ScheduledMatches" method="get" class="mb-4 bg-white p-3 rounded shadow-sm">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Category</label>
+                <select id="categoryFilter" class="form-select form-select-sm">
+                    <option value="All">All Categories</option>
+                    <option value="Boys">Boys</option>
+                    <option value="Girls">Girls</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Sport</label>
+                <select name="sportId" class="form-select form-select-sm" asp-items="ViewBag.SportID">
+                    <option value="">All Sports</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Department</label>
+                <select name="deptId" class="form-select form-select-sm" asp-items="ViewBag.DeptID">
+                    <option value="">All Departments</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Apply Sport/Dept</button>
+                <a asp-action="ScheduledMatches" class="btn btn-sm btn-outline-secondary">Clear</a>
+            </div>
+        </div>
+    </form>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover shadow-sm rounded-3 overflow-hidden">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Sport & Category</th>
+                        <th>Department A</th>
+                        <th>Department B</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var match in Model)
+                    {
+                        <tr class="match-row" data-category="@match.Category">
+                            <td>@match.MatchDate.ToString("MMM dd, yyyy HH:mm")</td>
+                            <td>
+                                <div class="fw-bold">@match.Sport.SportName</div>
+                                <span class="badge @(match.Category == SportsPortal.Models.TeamCategory.Boys ? "bg-primary" : "bg-danger")" style="font-size: 0.7rem;">@match.Category</span>
+                            </td>
+                            <td>@(match.DepartmentA?.DeptName ?? "TBD")</td>
+                            <td>@(match.DepartmentB?.DeptName ?? "TBD")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info shadow-sm">
+            <i class="bi bi-info-circle me-2"></i>No matches are currently scheduled.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', function() {
+                    const selected = this.value;
+                    const rows = document.querySelectorAll('.match-row');
+                    rows.forEach(row => {
+                        if (selected === 'All' || row.dataset.category === selected) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+}

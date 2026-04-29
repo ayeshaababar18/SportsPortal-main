@@ -1,0 +1,108 @@
+@model SportsPortal.Models.SearchResultsViewModel
+
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-5 display-4 text-primary">Search Results for "@Model.SearchString"</h1>
+
+    @if (string.IsNullOrWhiteSpace(Model.SearchString))
+    {
+        <div class="alert alert-info text-center" role="alert">
+            Please enter a search term to find results.
+        </div>
+    }
+    else if (!Model.Players.Any() && !Model.Matches.Any())
+    {
+        <div class="alert alert-warning text-center" role="alert">
+            No results found for your search.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-3 text-primary">Players (@Model.Players.Count())</h2>
+                @if (Model.Players.Any())
+                {
+                    <ul class="list-group mb-4">
+                        @foreach (var player in Model.Players)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@player.FullName</strong>
+                                    @if (!string.IsNullOrEmpty(player.RegNumber))
+                                    {
+                                        <small class="text-muted ms-2">(@player.RegNumber)</small>
+                                    }
+                                    <span class="badge bg-secondary ms-2">@player.Department.DeptName</span>
+                                    <span class="badge bg-info ms-2">@player.Sport.SportName</span>
+                                    @if (player.IsCaptain)
+                                    {
+                                        <span class="badge bg-warning text-dark ms-2">Captain</span>
+                                    }
+                                </div>
+                                <a asp-controller="Players" asp-action="Details" asp-route-id="@player.PlayerID" class="btn btn-sm btn-outline-primary">View Profile</a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="alert alert-info" role="alert">
+                        No players found matching your search.
+                    </div>
+                }
+            </div>
+
+            <div class="col-12 mt-4">
+                <h2 class="mb-3 text-primary">Matches (@Model.Matches.Count())</h2>
+                @if (Model.Matches.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover shadow-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sport</th>
+                                    <th>Teams</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                    <th>Season</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var match in Model.Matches)
+                                {
+                                    <tr>
+                                        <td>@match.MatchDate.ToShortDateString()</td>
+                                        <td>@match.Sport.SportName</td>
+                                        <td>
+                                            @(match.DepartmentA?.DeptName ?? "TBD") vs @(match.DepartmentB?.DeptName ?? "TBD")
+                                        </td>
+                                        <td>
+                                            @(match.ScoreA ?? "N/A") - @(match.ScoreB ?? "N/A")
+                                        </td>
+                                        <td>@match.Status</td>
+                                        <td>@match.Season.Year</td>
+                                        <td>
+                                            <a asp-controller="Matches" asp-action="Details" asp-route-id="@match.MatchID" class="btn btn-sm btn-outline-info">Details</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info" role="alert">
+                        No matches found matching your search.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

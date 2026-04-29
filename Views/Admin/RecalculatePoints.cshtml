@@ -1,0 +1,77 @@
+@model SportsPortal.Models.PointsRecalculationViewModel
+
+@{
+    ViewData["Title"] = "Points Recalculation Report";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-4 text-primary">Points Recalculation Report</h1>
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="accordion" id="pointsAccordion">
+        @foreach (var dept in Model.DepartmentReports)
+        {
+            var collapseId = $"collapse{dept.DeptName.Replace(" ", "")}";
+            var headingId = $"heading{dept.DeptName.Replace(" ", "")}";
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="@headingId">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="false" aria-controls="@collapseId">
+                        <span class="fw-bold me-auto">@dept.DeptName</span>
+                        <span class="badge bg-primary rounded-pill">Total Points: @dept.TotalPoints</span>
+                    </button>
+                </h2>
+                <div id="@collapseId" class="accordion-collapse collapse" aria-labelledby="@headingId">
+                    <div class="accordion-body">
+                        @if (dept.MatchDetails.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Sport</th>
+                                            <th>Opponent</th>
+                                            <th>Score</th>
+                                            <th>Result</th>
+                                            <th>Points</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var match in dept.MatchDetails)
+                                        {
+                                            <tr class="@(match.Outcome == "Win" ? "table-success" : (match.Outcome == "Draw" ? "table-warning" : "table-light"))">
+                                                <td>@match.MatchDate.ToShortDateString()</td>
+                                                <td>@match.SportName</td>
+                                                <td>@match.OpponentName</td>
+                                                <td>@match.ScoreResult</td>
+                                                <td>@match.Outcome</td>
+                                                <td><strong>@match.PointsAwarded</strong></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted fst-italic">No finished matches found for this department.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Dashboard" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>

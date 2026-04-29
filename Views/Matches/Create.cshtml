@@ -1,0 +1,73 @@
+@model SportsPortal.Models.Match
+
+@{
+    ViewData["Title"] = "Create Match";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="SportID" class="form-label"></label>
+                            <select asp-for="SportID" class="form-select" asp-items="ViewBag.SportID"></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="SeasonID" class="form-label"></label>
+                            <select asp-for="SeasonID" class="form-select" asp-items="ViewBag.SeasonID"></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DeptA_ID" class="form-label">Department A</label>
+                            <select asp-for="DeptA_ID" class="form-select" asp-items="ViewBag.DeptA_ID"></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="DeptB_ID" class="form-label">Department B</label>
+                            <select asp-for="DeptB_ID" class="form-select" asp-items="ViewBag.DeptB_ID"></select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ScoreA" class="form-label"></label>
+                            <input asp-for="ScoreA" class="form-control" />
+                            <span asp-validation-for="ScoreA" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ScoreB" class="form-label"></label>
+                            <input asp-for="ScoreB" class="form-control" />
+                            <span asp-validation-for="ScoreB" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Live">Live</option>
+                                <option value="Finished">Finished</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MatchDate" class="form-label"></label>
+                            <input asp-for="MatchDate" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="MatchDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Create Match</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

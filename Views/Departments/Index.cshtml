@@ -1,0 +1,84 @@
+@model IEnumerable<SportsPortal.Models.Department>
+
+@{
+    ViewData["Title"] = "Departments";
+    Layout = "_LayoutPublic";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-5 display-4 text-primary">Our Departments</h1>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var department in Model)
+            {
+                                <div class="col">
+                                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden department-card">
+                                        <a asp-action="Details" asp-route-id="@department.DeptID" class="text-decoration-none text-dark d-flex flex-column h-100">
+                                            @if (!string.IsNullOrEmpty(department.LogoUrl))
+                                            {
+                                                <div class="logo-wrapper">
+                                                    <img src="@department.LogoUrl" class="img-fluid department-logo" alt="@department.DeptName Logo">
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="logo-wrapper d-flex align-items-center justify-content-center bg-light text-muted">
+                                                    <i class="bi bi-building display-4 opacity-50"></i>
+                                                </div>
+                                            }
+                                            <div class="card-body text-center d-flex flex-column justify-content-center pt-4">
+                                                <h5 class="card-title fw-bold text-primary mb-2">@department.DeptName</h5>
+                                                <div class="mt-auto">
+                                                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-2">
+                                                        <i class="bi bi-trophy-fill text-warning me-1"></i> @department.TotalPoints Points
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center rounded-4 border-0 shadow-sm py-5" role="alert">
+                            <i class="bi bi-info-circle display-1 text-primary opacity-25 mb-3"></i>
+                            <p class="mb-0 fs-5">No departments found.</p>
+                        </div>
+                    }
+                </div>
+                
+                @section Styles {
+                    <style>
+                        .department-card {
+                            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                        }
+                        .department-card:hover {
+                            transform: translateY(-8px);
+                            box-shadow: 0 15px 30px rgba(65, 105, 225, 0.15) !important; /* Soft blueish shadow */
+                        }
+                        .logo-wrapper {
+                            height: 160px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+                            border-bottom: 1px solid rgba(0,0,0,0.03);
+                            padding: 20px;
+                        }
+                        .department-logo {
+                            max-height: 100%;
+                            max-width: 100%;
+                            object-fit: contain;
+                            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+                            transition: transform 0.3s ease;
+                        }
+                        .department-card:hover .department-logo {
+                            transform: scale(1.1);
+                        }
+                    </style>
+                }
+                

@@ -1,0 +1,83 @@
+@model SportsPortal.Models.TeamDetailsViewModel
+
+@{
+    ViewData["Title"] = "Team Details";
+}
+
+
+<div>
+    <h4>@Model.Team.TeamName</h4>
+    <span class="badge @(Model.Team.Category == TeamCategory.Boys ? "bg-primary" : "bg-danger")">
+        @Model.Team.Category
+    </span>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            Team Name
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Team.TeamName)
+        </dd>
+        <dt class = "col-sm-2">
+            Sport
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Team.Sport.SportName)
+        </dd>
+        <dt class = "col-sm-2">
+            Department
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Team.Department.DeptName)
+        </dd>
+    </dl>
+</div>
+
+<div class="mt-4">
+    <h4>Team Roster</h4>
+    @if (Model.Players.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Reg Number</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var player in Model.Players)
+                {
+                    <tr class="@(player.IsCaptain ? "table-warning" : "")">
+                        <td>@player.FullName</td>
+                        <td>@player.RegNumber</td>
+                        <td>
+                            @if (player.IsCaptain)
+                            {
+                                <span class="badge bg-warning text-dark">Captain</span>
+                            }
+                            else
+                            {
+                                <span>Player</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            No players found for this team.
+        </div>
+    }
+</div>
+
+<div>
+    @if (User.IsInRole("Organizer"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Team.TeamID" class="btn btn-primary">Edit Team</a> 
+    }
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

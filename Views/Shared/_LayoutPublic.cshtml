@@ -1,0 +1,156 @@
+@using SportsPortal.Data
+@inject ApplicationDbContext _context
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CUST Sports Week</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SportsPortal.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header>
+        <nav class="floating-nav">
+            <!-- Left Side: Back Button & Logo -->
+            <div class="d-flex align-items-center">
+                <a href="javascript:history.back()" class="nav-link text-secondary me-2" title="Go Back">
+                    <i class="bi bi-arrow-left link-icon" style="font-size: 1.2rem;"></i>
+                </a>
+                <a class="nav-logo" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.jfif" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
+                    <span class="link-title">CUST Sports Week</span>
+                </a>
+            </div>
+
+            <!-- Center: Nav Items (Visible on Md+) -->
+            <div class="nav-items-container d-none d-md-flex">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-house-door link-icon"></i>
+                    <span class="link-title">Home</span>
+                </a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Departments" ? "active" : "")" asp-area="" asp-controller="Departments" asp-action="Index">
+                    <i class="bi bi-building link-icon"></i>
+                    <span class="link-title">Departments</span>
+                </a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "PointsTable" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="PointsTable">
+                    <i class="bi bi-trophy link-icon"></i>
+                    <span class="link-title">Points Table</span>
+                </a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "ScheduledMatches" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="ScheduledMatches">
+                    <i class="bi bi-calendar-event link-icon"></i>
+                    <span class="link-title">Schedule</span>
+                </a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Gallery" ? "active" : "")" asp-area="" asp-controller="Gallery" asp-action="Index">
+                    <i class="bi bi-images link-icon"></i>
+                    <span class="link-title">Gallery</span>
+                </a>
+            </div>
+
+            <!-- Right Side: Auth (Visible on Md+) -->
+            <div class="d-none d-md-flex align-items-center">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")" asp-area="" asp-controller="Admin" asp-action="Dashboard">
+                        <i class="bi bi-speedometer2 link-icon"></i>
+                        <span class="link-title">Admin</span>
+                    </a>
+                    <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Logout">
+                        <i class="bi bi-box-arrow-right link-icon"></i>
+                    </a>
+                }
+                else
+                {
+                    <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" && ViewContext.RouteData.Values["Action"]?.ToString() == "Login" ? "active" : "")" asp-area="" asp-controller="Admin" asp-action="Login">
+                        <i class="bi bi-person link-icon"></i>
+                        <span class="link-title">Login</span>
+                    </a>
+                }
+            </div>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <i class="bi bi-list fs-2"></i>
+            </button>
+
+            <!-- Scroll Progress Border -->
+            <svg id="scroll-progress-container">
+                <defs>
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#FF0000;stop-opacity:1" /> <!-- cust-accent -->
+                        <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect id="scroll-progress-bar" x="2" y="2" rx="25" ry="25" />
+            </svg>
+        </nav>
+    </header>
+
+    <div class="app-content-wrapper container-fluid px-4 flex-grow-1">
+        <div class="row justify-content-center" id="layout-row">
+            <!-- Left Sidebar (Live Updates) -->
+            <div class="d-none d-lg-block layout-side-col transition-width" id="sidebar-left-col">
+                <div class="sticky-top pt-3" style="top: 20px;">
+                    <!-- Live Updates (Moved from Right) -->
+                    <div class="card shadow-sm border-0 mb-3 rounded-4 bg-primary text-white sidebar-card">
+                        <div class="card-body p-3 position-relative">
+                            <div class="view-expanded">
+                                <h6 class="text-uppercase mb-2 fw-bold small">Live Updates</h6>
+                                <p class="small mb-0 opacity-75">No new updates.</p>
+                            </div>
+                            <div class="view-collapsed d-none">
+                                <h6 class="vertical-text text-white">LIVE</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="layout-main-col transition-width" id="main-content-col">
+                <main role="main" class="pb-3 fade-in-up">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <!-- Right Sidebar (Alerts) -->
+            <div class="d-none d-lg-block layout-side-col transition-width" id="sidebar-right-col">
+                <div class="sticky-top pt-3" style="top: 20px;">
+                    <!-- Announcements -->
+                    <div class="card shadow-sm border-0 mb-3 rounded-4 bg-danger text-white sidebar-card">
+                        <div class="card-body p-3 position-relative">
+                            <div class="view-expanded">
+                                <h6 class="text-uppercase text-white mb-2 fw-bold small">Alerts</h6>
+                                <div id="alerts-content">
+                                    <p class="small text-white-50 mb-0">No new alerts.</p>
+                                </div>
+                            </div>
+                            <div class="view-collapsed d-none">
+                                <h6 class="vertical-text text-white">ALERTS</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-light mt-auto py-4">
+        <div class="container text-center">
+            <p>&copy; @DateTime.Now.Year - CUST Sports Portal - All Rights Reserved</p>
+        </div>
+    </footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <button id="scrollToTopBtn" class="btn btn-primary scroll-to-top-btn"><i class="bi bi-arrow-up"></i></button>
+    <button id="scrollToBottomBtn" class="btn btn-primary scroll-to-bottom-btn"><i class="bi bi-arrow-down"></i></button>
+</body>
+</html>

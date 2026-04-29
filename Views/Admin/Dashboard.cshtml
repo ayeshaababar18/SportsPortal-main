@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-5 display-4 text-primary">Admin Dashboard</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <a asp-controller="Matches" asp-action="Index" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-calendar-event text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Manage Matches</h5>
+                        <p class="text-muted mb-0 small">Create, edit, and delete match schedules and results.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Players" asp-action="Index" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-people text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Manage Players</h5>
+                        <p class="text-muted mb-0 small">Manage student players and their details.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Teams" asp-action="Index" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-microsoft-teams text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Manage Teams</h5>
+                        <p class="text-muted mb-0 small">Organize teams for different sports.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Departments" asp-action="Manage" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-building text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Manage Departments</h5>
+                        <p class="text-muted mb-0 small">Add or update university departments.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Sports" asp-action="Index" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-trophy text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Manage Sports</h5>
+                        <p class="text-muted mb-0 small">Add or remove sports from the event.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Announcements" asp-action="Index" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-megaphone text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Manage Announcements</h5>
+                        <p class="text-muted mb-0 small">Post and manage news and updates.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Admin" asp-action="UpdateCaptains" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-badge text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Update Captains</h5>
+                        <p class="text-muted mb-0 small">Assign and modify team captains for various sports.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Admin" asp-action="RecalculatePoints" class="card h-100 p-4 text-decoration-none shadow-sm hover-effect border-0">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-calculator text-primary fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-primary fw-bold mb-1">Recalculate Points</h5>
+                        <p class="text-muted mb-0 small">Manually recalculate the points for all departments.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+@model SportsPortal.Models.Department
+
+@{
+    ViewData["Title"] = "Edit Department";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="DeptID" />
+                    <div class="mb-3">
+                        <label asp-for="DeptName" class="form-label"></label>
+                        <input asp-for="DeptName" class="form-control" />
+                        <span asp-validation-for="DeptName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="LogoUrl" class="form-label"></label>
+                        <input asp-for="LogoUrl" class="form-control" />
+                        <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TotalPoints" class="form-label"></label>
+                        <input asp-for="TotalPoints" class="form-control" />
+                        <span asp-validation-for="TotalPoints" class="text-danger"></span>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

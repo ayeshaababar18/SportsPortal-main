@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin - SportsPortal</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SportsPortal.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="floating-nav">
+            <!-- Left: Back & Logo -->
+            <div class="d-flex align-items-center">
+                <a href="javascript:history.back()" class="nav-link text-secondary me-2" title="Go Back">
+                    <i class="bi bi-arrow-left link-icon" style="font-size: 1.2rem;"></i>
+                </a>
+                <a class="nav-logo" asp-area="" asp-controller="Admin" asp-action="Dashboard">
+                    <img src="~/images/logo.jfif" alt="Logo" width="40" height="40" class="me-2 rounded-circle">
+                    <span>Admin Panel</span>
+                </a>
+            </div>
+
+            <!-- Center: Nav Items -->
+            <div class="nav-items-container d-none d-md-flex">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Matches" ? "active" : "")" asp-area="" asp-controller="Matches" asp-action="Index" asp-route-year="@(Context.Request.Query["year"].Count > 0 ? Context.Request.Query["year"][0] : DateTime.Now.Year.ToString())">
+                    <i class="bi bi-controller link-icon"></i>
+                    <span class="link-title">Matches</span>
+                </a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "UpdateCaptains" ? "active" : "")" asp-area="" asp-controller="Admin" asp-action="UpdateCaptains">
+                    <i class="bi bi-people link-icon"></i>
+                    <span class="link-title">Captains</span>
+                </a>
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "SystemSettings" ? "active" : "")" asp-area="" asp-controller="Admin" asp-action="SystemSettings">
+                    <i class="bi bi-gear link-icon"></i>
+                    <span class="link-title">Settings</span>
+                </a>
+            </div>
+
+            <!-- Right: Controls -->
+             <div class="d-flex align-items-center d-none d-md-flex gap-2">
+                 <select class="form-select form-select-sm" id="yearSelector" name="year" style="width: auto; border-radius: 20px; border: 1px solid #dee2e6;">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+                <a class="nav-link text-secondary" asp-area="" asp-controller="Home" asp-action="Index" title="Public Site">
+                    <i class="bi bi-house-door link-icon" style="font-size: 1.2rem;"></i>
+                </a>
+                <a class="nav-link text-danger" asp-area="" asp-controller="Admin" asp-action="Logout" title="Logout">
+                    <i class="bi bi-box-arrow-right link-icon" style="font-size: 1.2rem;"></i>
+                </a>
+            </div>
+            
+             <!-- Mobile Toggle -->
+            <button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <i class="bi bi-list fs-2"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div class="app-content-wrapper container-fluid px-4">
+        <!-- Admin typically uses full width or simpler container -->
+         <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <main role="main" class="pb-3 fade-in-up">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-light mt-auto py-4">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 text-center text-lg-start">
+                    <h5 class="text-uppercase"><a href="https://cust.edu.pk/" target="_blank" class="footer-link">CUST Sports Week</a></h5>
+                    <p>
+                        Admin Dashboard for Sports Week Portal.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <h5 class="text-uppercase">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="Matches" asp-action="Index" class="footer-link">Manage Matches</a></li>
+                        <li><a asp-controller="Admin" asp-action="UpdateCaptains" class="footer-link">Update Captains</a></li>
+                        <li><a asp-controller="Admin" asp-action="SystemSettings" class="footer-link">System Settings</a></li>
+                        <li><a asp-controller="Home" asp-action="Index" class="footer-link">Public Site</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 text-center text-lg-end">
+                    <h5 class="text-uppercase">Follow Us</h5>
+                    <div class="social-icons">
+                         <a href="https://www.facebook.com/capitaluniversityislamabad/" target="_blank" class="social-icon"><i class="bi bi-facebook"></i></a>
+                        <a href="https://twitter.com/cust_official" target="_blank" class="social-icon"><i class="bi bi-twitter-x"></i></a>
+                        <a href="https://www.linkedin.com/school/capital-university-of-science-and-technology/" target="_blank" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://www.instagram.com/capital_university/?hl=en" target="_blank" class="social-icon"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.youtube.com/@@capitaluniversityislamabad" target="_blank" class="social-icon"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-3 mt-3 border-top border-secondary">
+                <p>&copy; @DateTime.Now.Year - CUST Sports Portal - All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const yearSelector = document.getElementById('yearSelector');
+            const urlParams = new URLSearchParams(window.location.search);
+            const year = urlParams.get('year') || '2025';
+            if(yearSelector) {
+                yearSelector.value = year;
+
+                yearSelector.addEventListener('change', function () {
+                    var selectedYear = this.value;
+                    var currentUrl = new URL(window.location.href);
+                    currentUrl.searchParams.set("year", selectedYear);
+                    window.location.href = currentUrl.toString();
+                });
+            }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <button id="scrollToTopBtn" class="btn btn-primary scroll-to-top-btn"><i class="bi bi-arrow-up"></i></button>
+    <button id="scrollToBottomBtn" class="btn btn-primary scroll-to-bottom-btn"><i class="bi bi-arrow-down"></i></button>
+</body>
+</html>

@@ -1,0 +1,524 @@
+:root {
+    /* Color Palette - Royal Blue, Bright Red, Black, White */
+    --cust-primary: #4169E1; /* Royal Blue */
+    --cust-primary-dark: #27408B; /* Darker Royal Blue for hover/active states */
+    --cust-secondary: #000000; /* Black for secondary elements/text */
+    --cust-accent: #FF0000; /* Bright Red */
+    --cust-accent-hover: #CC0000; /* Darker Red */
+    
+    --cust-light-gray: #F8F9FA; /* Off-White/Light Gray background */
+    --cust-medium-gray: #E9ECEF; /* Medium Gray for borders/dividers */
+    --cust-dark-gray: #343A40; /* Dark Gray for footer/text */
+    
+    --cust-text-light: #FFFFFF;
+    --cust-text-dark: #212529; /* Almost Black */
+    
+    /* 3D Depth Shadows */
+    --cust-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --cust-shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    --cust-accent-rgb: 255, 0, 0; /* RGB for Red shadow */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--cust-light-gray);
+    color: var(--cust-text-dark);
+    line-height: 1.6;
+}
+
+/* Global 3D Overrides */
+.shadow-sm {
+    box-shadow: var(--cust-shadow) !important;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.shadow-sm:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--cust-shadow-hover) !important;
+}
+
+/* Prevent hover effect on static layout elements */
+.sticky-top .card.shadow-sm:hover {
+    transform: none;
+    box-shadow: var(--cust-shadow) !important;
+}
+
+/* --- Navigation Bar --- */
+.navbar {
+    background-color: #fff !important;
+    border-bottom: 1px solid #ddd;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: #dc3545 !important;
+    margin: 0 auto;
+}
+
+.nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-link.active,
+.nav-link:hover {
+    color: #dc3545 !important;
+}
+
+/* Floating Nav specific styles */
+.floating-nav {
+  padding: 0.5rem 1.5rem;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 50px;
+  box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.075);
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1030;
+  width: 95%;
+  max-width: 1400px;
+  margin: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 60px;
+}
+
+.floating-nav .nav-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #dc3545;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-right: 20px;
+    height: 40px;
+}
+
+.floating-nav .nav-items-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+}
+
+.floating-nav .nav-link {
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  transition: all 0.8s ease;
+  margin: 0;
+  height: 40px;
+}
+
+/* Scrolled State Styles */
+.floating-nav.scrolled {
+    padding: 0.5rem 1rem;
+    width: fit-content;
+    max-width: fit-content;
+    justify-content: center;
+    gap: 15px;
+    top: 10px;
+    border-radius: 50px;
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-height: 60px;
+}
+
+/* App Content Wrapper */
+.app-content-wrapper {
+    padding-top: 100px;
+}
+
+/* Nav Item Collapse Logic */
+.floating-nav.scrolled .nav-logo span {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin: 0;
+    transition: all 0.8s ease;
+}
+
+.floating-nav.scrolled .nav-logo {
+    margin-right: 0;
+}
+
+.floating-nav .nav-link .link-title {
+    opacity: 1;
+    max-width: 150px;
+    white-space: nowrap;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.floating-nav.scrolled .link-title {
+    opacity: 0;
+    max-width: 0;
+    margin-left: 0;
+}
+
+.floating-nav.scrolled .nav-link:hover .link-title {
+    opacity: 1;
+    max-width: 150px;
+    margin-left: 10px;
+}
+
+/* Floating Nav Active Glow */
+.floating-nav .nav-link.active {
+    background-color: rgba(255, 0, 0, 0.15); /* Translucent Red Highlight */
+    color: var(--cust-accent) !important;
+}
+
+.floating-nav .nav-link.active i {
+    text-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+    color: var(--cust-accent) !important;
+}
+
+/* --- UI Enhancers --- */
+#scroll-progress-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1031; /* Above nav content for border effect, or adjust if blocking interactions */
+    pointer-events: none; /* Critical: allow clicks pass through */
+    overflow: visible;
+}
+
+#scroll-progress-bar {
+    fill: none;
+    stroke: url(#progressGradient);
+    stroke-width: 4;
+    stroke-linecap: round;
+    width: calc(100% - 4px); /* Account for stroke width */
+    height: calc(100% - 4px);
+    /* Dasharray/offset will be set by JS */
+}
+
+@keyframes fadeInPage {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+main {
+    animation: fadeInPage 0.5s ease-out forwards;
+}
+
+/* --- Scheduled Matches Specifics --- */
+.schedule-container {
+    padding-bottom: 50px;
+}
+
+.schedule-date-header {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-left: 15px;
+    border-left: 5px solid var(--cust-primary);
+    color: var(--cust-primary-dark);
+    font-weight: 700;
+}
+
+.match-card-new {
+    border: none;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: var(--cust-shadow);
+    transition: all 0.3s ease;
+    background-color: #fff;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.match-card-new::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: var(--cust-accent);
+}
+
+.match-card-new:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(220, 53, 69, 0.15);
+}
+
+.match-card-header {
+    padding: 15px 20px;
+    background-color: var(--cust-light-gray);
+    border-bottom: 1px solid var(--cust-medium-gray);
+}
+
+.match-card-header h5 {
+    margin: 0;
+    color: var(--cust-dark-gray);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.match-card-body {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.team-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 100px;
+}
+
+.team-logo {
+    width: 60px;
+    height: 60px;
+    background-color: var(--cust-medium-gray);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--cust-primary-dark);
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.team-name {
+    font-weight: 600;
+    text-align: center;
+    color: var(--cust-text-dark);
+}
+
+.match-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+.match-time {
+    font-size: 0.9rem;
+    color: var(--cust-dark-gray);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.vs-separator {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--cust-accent);
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+/* --- Footer --- */
+.footer {
+    background-color: #000000;
+    color: var(--cust-text-light);
+    padding-top: 3rem;
+    padding-bottom: 1.5rem;
+}
+
+/* --- Layout Scroll Animations --- */
+.transition-width {
+    transition: flex-basis 0.8s ease-in-out, max-width 0.8s ease-in-out; 
+    will-change: flex-basis, max-width;
+}
+
+/* Sidebar Card Styling */
+.sidebar-card {
+    min-height: 80px; /* Reduced height as requested (approx 2/5 of previous) */
+    overflow: hidden;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+/* Expanded View Content - Prevent Reflow */
+.view-expanded {
+    min-width: 250px;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+}
+
+/* Initial Layout States - RESTORED */
+.layout-side-col {
+    flex: 0 0 12.5%;
+    max-width: 12.5%; /* Ensure it doesn't grow */
+    min-width: 0;
+    /* overflow: hidden; REMOVED */
+}
+
+/* Clip content inside the sticky container instead */
+.layout-side-col .sticky-top {
+    overflow: hidden;
+    width: 100%;
+}
+
+.layout-side-col.sidebar-collapsed {
+    flex: 0 0 60px;
+    max-width: 60px;
+}
+
+.layout-main-col {
+    flex: 1; /* Automatically takes remaining space - prevents bounce */
+    min-width: 0;
+}
+
+/* Collapsed View - Vertical Text */
+.view-collapsed {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex !important; /* Always display, just hide via opacity */
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease-in 0.3s; /* Fade in with delay */
+}
+
+/* Sidebar Collapsed State overrides */
+.sidebar-collapsed .view-expanded {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebar-collapsed .view-collapsed {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 1rem;
+    letter-spacing: 2px;
+}
+
+/* Main Content Expanded State */
+.content-expanded {
+    flex: 1 !important; /* Take all remaining space */
+    max-width: calc(100% - 120px) !important; /* Full width minus two collapsed sidebars */
+}
+
+/* AI Assistant Expansion */
+.ai-card-transition.active {
+    position: relative; /* Keep in flow to avoid jumping */
+    transform: scale(1.05);
+    z-index: 1050;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Floating Scroll Buttons */
+.scroll-to-top-btn, .scroll-to-bottom-btn {
+    position: fixed;
+    right: 30px;
+    z-index: 1030;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: none; /* JS will handle showing */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.scroll-to-top-btn {
+    bottom: 30px;
+}
+
+.scroll-to-bottom-btn {
+    bottom: 85px;
+}
+
+/* Animations */
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+.pulse-animation {
+    animation: pulse-red 2s infinite;
+}
+
+/* AI Prominent Styles */
+.btn-ai-prominent {
+    background: linear-gradient(135deg, var(--cust-primary), #8e44ad); /* Royal Blue to Purple */
+    color: white !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(65, 105, 225, 0.4);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.btn-ai-prominent:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(142, 68, 173, 0.5);
+    background: linear-gradient(135deg, #27408B, #9b59b6);
+}
+
+.ai-response-box {
+    background-color: #fcfcfc;
+    border: 1px solid #e9ecef;
+    border-left: 5px solid var(--cust-primary);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.ai-response-box strong {
+    color: var(--cust-primary-dark);
+}
+
+.ai-response-box ul, .ai-response-box ol {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-left: 20px;
+}
+
+.ai-response-box li {
+    margin-bottom: 5px;
+}

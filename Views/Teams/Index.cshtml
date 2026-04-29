@@ -1,0 +1,109 @@
+@model IEnumerable<SportsPortal.Models.Team>
+
+@{
+    ViewData["Title"] = "Teams";
+    Layout = User.IsInRole("Organizer") ? "_LayoutAdmin" : "_LayoutPublic";
+}
+
+<h1 class="text-primary mb-4">@(User.IsInRole("Organizer") ? "Manage Teams" : "Teams")</h1>
+
+@if (User.IsInRole("Organizer"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New Team</a>
+    </p>
+}
+
+<form asp-controller="Teams" asp-action="Index" method="get" class="mb-4 bg-light p-3 rounded shadow-sm">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label small fw-bold">Sport</label>
+            <select name="sportId" class="form-select form-select-sm" asp-items="ViewBag.SportID">
+                <option value="">All Sports</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label small fw-bold">Department</label>
+            <select name="deptId" class="form-select form-select-sm" asp-items="ViewBag.DeptID">
+                <option value="">All Departments</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-sm btn-primary flex-grow-1">Filter</button>
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Clear</a>
+        </div>
+    </div>
+</form>
+
+<div class="table-responsive">
+    <ul class="nav nav-tabs mb-3" id="teamTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="boys-tab" data-bs-toggle="tab" data-bs-target="#boys" type="button" role="tab" aria-controls="boys" aria-selected="true">Boys Teams</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="girls-tab" data-bs-toggle="tab" data-bs-target="#girls" type="button" role="tab" aria-controls="girls" aria-selected="false">Girls Teams</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="teamTabsContent">
+        <div class="tab-pane fade show active" id="boys" role="tabpanel" aria-labelledby="boys-tab">
+            <table class="table table-striped table-hover shadow-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Team Name</th>
+                        <th>Sport</th>
+                        <th>Department</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Where(t => t.Category == TeamCategory.Boys)) {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.TeamName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Sport.SportName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Department.DeptName)</td>
+                            <td>
+                                @if (User.IsInRole("Organizer"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.TeamID" class="btn btn-sm btn-primary">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.TeamID" class="btn btn-sm btn-danger">Delete</a>
+                                }
+                                <a asp-action="Details" asp-route-id="@item.TeamID" class="btn btn-sm btn-info">Details</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-pane fade" id="girls" role="tabpanel" aria-labelledby="girls-tab">
+            <table class="table table-striped table-hover shadow-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Team Name</th>
+                        <th>Sport</th>
+                        <th>Department</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Where(t => t.Category == TeamCategory.Girls)) {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.TeamName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Sport.SportName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Department.DeptName)</td>
+                            <td>
+                                @if (User.IsInRole("Organizer"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.TeamID" class="btn btn-sm btn-primary">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@item.TeamID" class="btn btn-sm btn-danger">Delete</a>
+                                }
+                                <a asp-action="Details" asp-route-id="@item.TeamID" class="btn btn-sm btn-info">Details</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
